@@ -52,10 +52,12 @@ Construir uma ferramenta de linha de comando que identifica o algoritmo de hash 
 
 ## ✅ Definition of Done
 
-- [ ] `just test` passa (mais de 30 testes)
-- [ ] `just lint` passa (ruff + mypy --strict + pylint)
-- [ ] `just run -- <hash>` identifica corretamente os hashes de demonstração
-- [ ] Códigos de saída corretos para scripts de shell
+- [x] `just test` passa (mais de 30 testes)
+- [x] `just lint` passa (ruff + mypy --strict + pylint)
+- [x] `just run -- <hash>` identifica corretamente os hashes de demonstração
+- [x] Códigos de saída corretos para scripts de shell
+
+Validação em 07/10/2026: 70 testes passaram; Ruff e Mypy estrito sem erros; Pylint 10/10. CLI e encaminhamento de argumentos com `$` verificados no Windows.
 
 ## 🧪 Validation
 
@@ -78,7 +80,96 @@ Execute a ferramenta com os hashes de demonstração e explique:
 
 ## 🚀 Getting Started
 
-Dentro de `projects/Individual/a-Hash_ID/`:
+### Windows / PowerShell — versão implementada
+
+Abra o terminal na pasta `Hash_ID`. Python 3.13+ e `uv` devem estar instalados
+(o desenvolvimento foi validado com Python 3.14). Não é necessário instalar `just`:
+
+```powershell
+python manage.py setup
+python manage.py test
+python manage.py lint
+python manage.py run 5f4dcc3b5aa765d61d8327deb882cf99
+python manage.py run --json --top 1 5f4dcc3b5aa765d61d8327deb882cf99
+python manage.py run --file demo_hashes.txt
+python manage.py run --file demo_hashes.txt --json
+Get-Content demo_hashes.txt | python manage.py run --json
+```
+
+`setup` instala as versões de `uv.lock` em `.deps/`, usando o Python já instalado,
+sem alterar os pacotes globais. `manage.py` encaminha os argumentos literalmente.
+Essa alternativa também funciona em sistemas que bloqueiam o executável criado
+por um ambiente virtual. A instalação inicial precisa de internet; o identificador
+funciona offline. Se preferir um ambiente virtual convencional, use
+`uv sync --all-extras` e `uv run hashid <hash>`.
+
+Com `just` 1.33+ instalado, `just setup`, `just test`, `just lint` e
+`just run -- <hash>` usam os mesmos atalhos portáveis. Execute `just setup` antes
+de `just test`/`just lint` para preparar `.deps/`.
+
+### Entrega: desafios 1.1 a 2.3
+
+| Desafio | Implementação | Demonstração após `python manage.py` |
+| --- | --- | --- |
+| 1.1 | Prefixo Solaris `$md5,` | `run '$md5,rounds=5000$salt$digest'` |
+| 1.2 | 24 hex / 96 bits, confiança baixa | `run a1a1a1a1a1a1a1a1a1a1a1a1` |
+| 1.3 | Array JSON de candidatos | `run --json 5f4dcc3b5aa765d61d8327deb882cf99` |
+| 2.1 | Arquivo UTF-8 ou stdin, leitura linha a linha | `run --file demo_hashes.txt --json` |
+| 2.2 | Campo e coluna `hashcat_mode`, com sugestão | `run 5f4dcc3b5aa765d61d8327deb882cf99` |
+| 2.3 | URL, `0x`, Base32, Base58 e Base64 | `run https://example.org/` |
+
+O enunciado original atribuía incorretamente 24 hex a Tiger-128: 24 × 4 = 96 bits,
+enquanto 128 bits precisam de 32 hex. A implementação informa a ambiguidade,
+e a correção está registrada em `learn/04-Desafios.md`.
+
+### Contrato de saída e erros
+
+- Entrada única com `--json`: array com `algorithm`, `confidence`, `reason` e
+  `hashcat_mode` (inteiro ou `null`). Sem candidatos, retorna `[]`.
+- Lote com `--json`: JSON Lines, um objeto por linha, com `line`, `input` e
+  `candidates`. A numeração corresponde às linhas do arquivo original.
+- Lote em texto: uma linha por entrada, com os candidatos separados por `;`.
+- Linhas vazias são ignoradas; duplicatas são preservadas. Arquivos UTF-8 com BOM
+  são aceitos. `--file -` lê stdin. Nenhum arquivo é carregado inteiro na memória.
+- Código **0**: todas as entradas não vazias receberam algum candidato ou pista.
+  Isso não certifica que sejam hashes: uma URL reconhecida também retorna 0.
+- Código **1**: alguma entrada desconhecida, entrada única vazia ou lote vazio.
+- Código **2**: argumentos inválidos, fontes conflitantes, arquivo inacessível
+  ou erro de codificação. Diagnósticos de leitura vão para stderr.
+- Em falha durante a leitura de um lote, resultados anteriores podem já ter sido
+  escritos. Confira também o código de saída (`$LASTEXITCODE` no PowerShell).
+
+### Como explicar na apresentação
+
+1. Mostre MD5: comprimento e alfabeto geram vários candidatos, incluindo NTLM.
+   `medium` expressa uma prioridade heurística, não uma probabilidade medida.
+2. Mostre bcrypt: o prefixo é evidência mais específica e recebe `high`.
+   A ferramenta não verifica integralmente os parâmetros e o corpo de cada formato.
+3. Mostre JSON e depois `demo_hashes.txt`: o mesmo `identify()` puro atende
+   tanto à saída humana quanto à automação. Os testes da CLI executam subprocessos reais.
+4. Mostre URL e Base32: codificação não é algoritmo. Base32/Base58/Base64 podem
+   inclusive conter um hash; não é possível descobrir isso só pelo alfabeto.
+5. Explique que não recuperamos senhas. O campo do hashcat apenas sugere um modo;
+   nenhum comando de quebra é executado. Os níveis 3–5 são extensões opcionais,
+   fora desta entrega do MVP.
+
+Os modos foram conferidos no [catálogo oficial do hashcat v7.1.2](https://github.com/hashcat/hashcat/blob/v7.1.2/docs/hashcat-example-hashes.md).
+Nem todos os candidatos têm modo mapeado, e alguns modos exigem adaptar o formato
+da entrada (por exemplo, a representação MySQL). Não escolha um modo apenas pelo
+primeiro candidato sem conhecer a origem do hash.
+
+### Limitações
+
+MD5, NTLM, MD4 e saídas truncadas podem compartilhar 32 hex. Hexadecimal também
+pode ser um identificador aleatório. Prefixos conhecidos são reconhecidos mesmo
+em exemplos didáticos incompletos. Base58 é apenas uma verificação de alfabeto e
+comprimento mínimo, sem checksum; há sobreposição com Base32. A pista de JWT
+verifica a forma aparente e não valida o token ou sua assinatura. Strings PHC
+desconhecidas continuam sendo pistas genéricas. Nenhuma confiança é prova de origem.
+
+### Instalação alternativa em Linux/macOS
+
+Dentro da pasta `Hash_ID`:
 
 ```bash
 sudo apt update
@@ -121,11 +212,12 @@ just run -- <h> # identifica um hash
 
 ## Requisitos
 
-- **Python 3.14+** — o script de instalação fará a verificação.
+- **Python 3.13+** — conforme `pyproject.toml`; validado com 3.14.
 - [`uv`](https://github.com/astral-sh/uv) — gerenciador moderno de pacotes para Python.
 - [`just`](https://github.com/casey/just) — executor de comandos.
 
-Nenhum compilador, biblioteca de sistema ou acesso à rede é necessário.
+Nenhum compilador é necessário. A instalação das dependências requer rede;
+a identificação funciona offline.
 
 ## 📚 Learning Resources
 

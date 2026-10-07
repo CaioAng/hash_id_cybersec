@@ -39,7 +39,7 @@ description = "Identifica tipos de hash por prefixo, comprimento e charset (nív
 
 # A versão mínima do Python que este projeto suporta.
 # >=3.13 significa "Python 3.13 ou qualquer versão mais recente".
-# Precisamos da 3.13 porque usamos a sintaxe moderna de type-hint (X | None).
+# Esta é a versão mínima adotada pelo projeto; X | None existe desde Python 3.10.
 requires-python = ">=3.13"
 
 # Quem escreveu o projeto. Aparece nos metadados do pacote.

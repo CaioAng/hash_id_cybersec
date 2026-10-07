@@ -29,10 +29,10 @@ Para cada desafio: **escreva o teste primeiro**. Depois faça o teste passar. Es
 
 ### Desafio 1.2: Adicione um comprimento a `HEX_LENGTH_RULES`
 
-Ainda não existe regra para 24 caracteres hexadecimais (96 bits). Esse comprimento é raro, mas `Tiger-128` e alguns hashes personalizados antigos produzem isso.
+Ainda não existe regra para 24 caracteres hexadecimais (96 bits). Correção do enunciado: Tiger-128 produz 128 bits, ou 32 caracteres hexadecimais. Para 24 caracteres, informe apenas uma possível saída truncada de 96 bits, com confiança baixa; o tamanho não determina o algoritmo.
 
-1. Adicione `24: ["Tiger-128"]` a `HEX_LENGTH_RULES`.
-2. Escreva um teste (`test_tiger128_length_returns_tiger128`).
+1. Adicione uma regra para 24 caracteres com o rótulo `Hexadecimal de 96 bits (possível hash truncado)`.
+2. Escreva um teste (`test_new_hex_length`).
 3. Execute `just test`.
 
 **Variação:** o que deve acontecer se alguém passar uma string de 24 caracteres que _não_ seja hexadecimal? A verificação existente `_is_hex` deve resolver isso. Leia a etapa 3 de `identify()` e confirme.
