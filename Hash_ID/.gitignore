@@ -1,0 +1,17 @@
+.venv/
+.deps/
+.deps-requirements.txt
+.uv-cache/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pylint_cache/
+pytest-cache-files-*/
+*.egg-info/
+build/
+dist/
+.coverage
+htmlcov/
+
+.test-input-*.txt
