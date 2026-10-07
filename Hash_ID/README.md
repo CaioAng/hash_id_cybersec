@@ -139,19 +139,6 @@ e a correção está registrada em `learn/04-Desafios.md`.
 - Em falha durante a leitura de um lote, resultados anteriores podem já ter sido
   escritos. Confira também o código de saída (`$LASTEXITCODE` no PowerShell).
 
-### Como explicar na apresentação
-
-1. Mostre MD5: comprimento e alfabeto geram vários candidatos, incluindo NTLM.
-   `medium` expressa uma prioridade heurística, não uma probabilidade medida.
-2. Mostre bcrypt: o prefixo é evidência mais específica e recebe `high`.
-   A ferramenta não verifica integralmente os parâmetros e o corpo de cada formato.
-3. Mostre JSON e depois `demo_hashes.txt`: o mesmo `identify()` puro atende
-   tanto à saída humana quanto à automação. Os testes da CLI executam subprocessos reais.
-4. Mostre URL e Base32: codificação não é algoritmo. Base32/Base58/Base64 podem
-   inclusive conter um hash; não é possível descobrir isso só pelo alfabeto.
-5. Explique que não recuperamos senhas. O campo do hashcat apenas sugere um modo;
-   nenhum comando de quebra é executado. Os níveis 3–5 são extensões opcionais,
-   fora desta entrega do MVP.
 
 Os modos foram conferidos no [catálogo oficial do hashcat v7.1.2](https://github.com/hashcat/hashcat/blob/v7.1.2/docs/hashcat-example-hashes.md).
 Nem todos os candidatos têm modo mapeado, e alguns modos exigem adaptar o formato
