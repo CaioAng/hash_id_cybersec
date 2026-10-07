@@ -15,3 +15,6 @@ dist/
 htmlcov/
 
 .test-input-*.txt
+
+# Cópia local opcional do just usada na gravação
+.demo-tools/

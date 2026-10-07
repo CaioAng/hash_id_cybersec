@@ -72,11 +72,16 @@ Teste com os [hashes de demonstração](#hashes-de-demonstração) abaixo.
 
 ## 🎬 Demo
 
-Execute a ferramenta com os hashes de demonstração e explique:
+A entrega escrita está em [DEMO.md, na raiz do repositório](../DEMO.md).
+Ela apresenta o problema, a arquitetura, resultados reproduzíveis, decisões,
+limitações, conclusões e o atendimento aos cinco critérios de avaliação.
 
-- Como cada hash foi identificado (prefixo, comprimento, formato)
-- Por que alguns candidatos têm confiança `high` e outros `medium`/`low`
-- O que a ferramenta **não** consegue concluir com certeza
+As saídas reais de testes, lint e execução estão em
+[evidencias/demo-validacao.txt](evidencias/demo-validacao.txt).
+
+Por ser um projeto individual, o autor deve gravar um vídeo de 5–10 minutos.
+O roteiro foi entregue separadamente e o link será enviado no canal indicado
+pela entidade, fora deste repositório. A gravação e o envio ainda dependem do autor.
 
 ## 🚀 Getting Started
 
